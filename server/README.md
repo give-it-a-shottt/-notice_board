@@ -28,6 +28,12 @@ python -m venv .venv                 # optional but recommended
 pip install -r requirements.txt
 ```
 
+= Optional: seed the database with fake data using [Faker](https://faker.readthedocs.io/):
+
+```bash
+python scripts/seed.py
+```
+
 Create an `.env` file (optional) to override defaults:
 
 ```
