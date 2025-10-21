@@ -3,18 +3,16 @@ import { register, login } from '../api';
 import { setAuth } from '../auth';
 
 const TEXT = {
-  login: '\ub85c\uadf8\uc778',
-  signup: '\ud68c\uc6d0\uac00\uc785',
-  idPlaceholder: '\uc544\uc774\ub514',
-  pwPlaceholder: '\ube44\ubc00\ubc88\ud638',
-  requireBoth:
-    '\uc544\uc774\ub514\uc640\u0020\ube44\ubc00\ubc88\ud638\ub97c\u0020\ubaa8\ub450\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694\u002e',
-  signupDone:
-    '\ud68c\uc6d0\uac00\uc785\uc774\u0020\uc644\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4\u002e\u0020\ub85c\uadf8\uc778\ud574\u0020\uc8fc\uc138\uc694\u002e',
-  signupFail: '\ud68c\uc6d0\uac00\uc785\u0020\uc2e4\ud328',
-  loginFail: '\ub85c\uadf8\uc778\u0020\uc2e4\ud328',
-  createAccount: '\uacc4\uc815\u0020\ub9cc\ub4e4\uae30',
-  back: '\ub4a4\ub85c\uac00\uae30',
+  login: '로그인',
+  signup: '회원가입',
+  idPlaceholder: '아이디',
+  pwPlaceholder: '비밀번호',
+  requireBoth: '아이디와 비밀번호를 모두 입력해주세요.',
+  signupDone: '회원가입이 완료되었습니다. 로그인해 주세요.',
+  signupFail: '회원가입 실패',
+  loginFail: '로그인 실패',
+  createAccount: '계정 만들기',
+  back: '뒤로가기',
 };
 
 function AuthModal({ open, onClose, onLogin }) {

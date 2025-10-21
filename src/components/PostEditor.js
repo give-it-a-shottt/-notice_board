@@ -2,23 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { createPost, editPost } from '../api';
 
 const TEXT = {
-  loginRequired:
-    '\ub85c\uadf8\uc778\u0020\ud6c4\u0020\uac8c\uc2dc\uae00\uc744\u0020\uc791\uc131\ud560\u0020\uc218\u0020\uc788\uc5b4\uc694\u002e',
-  titleContentRequired:
-    '\uc81c\ubaa9\uacfc\u0020\ub0b4\uc6a9\uc744\u0020\ubaa8\ub450\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694\u002e',
-  requestFailed: '\uc694\uccad\u0020\uc2e4\ud328',
-  titlePlaceholder:
-    '\uc81c\ubaa9\uc744\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694',
-  imagePlaceholder:
-    '\ub300\ud45c\u0020\uc774\ubbf8\uc9c0\u0020\u0055\u0052\u004c\uc744\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694\u0020\u0028\uc120\ud0dd\u0029',
-  previewAlt: '\ubbf8\ub9ac\ubcf4\uae30',
-  contentPlaceholder:
-    '\ub0b4\uc6a9\uc744\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694',
-  cancel: '\ucde8\uc18c',
-  submit: '\uac8c\uc2dc\ud558\uae30',
-  update: '\uc218\uc815\ud558\uae30',
-  editTitle: '\uac8c\uc2dc\uae00\u0020\uc218\uc815',
-  newTitle: '\uc0c8\u0020\uac8c\uc2dc\uae00\u0020\uc791\uc131',
+  loginRequired: '로그인 후 게시글을 작성할 수 있어요.',
+  titleContentRequired: '제목과 내용을 모두 입력해주세요.',
+  requestFailed: '요청 실패',
+  titlePlaceholder: '제목을 입력해주세요',
+  imagePlaceholder: '대표 이미지 URL을 입력해주세요 (선택)',
+  previewAlt: '미리보기',
+  contentPlaceholder: '내용을 입력해주세요',
+  cancel: '취소',
+  submit: '게시하기',
+  update: '수정하기',
+  editTitle: '게시글 수정',
+  newTitle: '새 게시글 작성',
 };
 
 function PostEditor({ onSave, onCancel, currentUser, editing }) {

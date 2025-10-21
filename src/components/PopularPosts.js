@@ -1,13 +1,11 @@
 import React, { useMemo } from 'react';
 
 const TEXT = {
-  title: '\uc778\uae30\uae00',
-  subtitle:
-    '\uc88b\uc544\uc694\u0020\uc21c\uc73c\ub85c\u0020\uac00\uc7a5\u0020\ud56b\ud55c\u0020\uae00\uc774\uc5d0\uc694',
-  previewFallback:
-    '\ub0b4\uc6a9\u0020\ubbf8\ub9ac\ubcf4\uae30\uac00\u0020\uc544\uc9c1\u0020\uc5c6\uc5b4\uc694\u002e',
-  anonymous: '\uc775\uba85',
-  like: '  \uc88b\uc544\uc694',
+  title: '인기글',
+  subtitle: '좋아요 순으로 가장 핫한 글이에요',
+  previewFallback: '내용 미리보기가 아직 없어요.',
+  anonymous: '익명',
+  like: '좋아요',
 };
 
 function PopularPosts({ posts = [], onOpenPost = () => {} }) {
@@ -65,6 +63,7 @@ function PopularPosts({ posts = [], onOpenPost = () => {} }) {
                   <span className="popular-card__author">
                     {post.author || TEXT.anonymous}
                   </span>
+                  &nbsp;&nbsp;
                   <span className="popular-card__likes">
                     {post.likes} {TEXT.like}
                   </span>

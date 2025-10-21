@@ -2,13 +2,12 @@ import '../MainContainer.css';
 import jungleLogo from '../asset/jungle.png';
 
 const TEXT = {
-  anonymous: '\uc775\uba85',
-  edit: '\uc218\uc815',
-  remove: '\uc0ad\uc81c',
-  like: '\uc88b\uc544\uc694',
-  dislike: '\uc2eb\uc5b4\uc694',
-  empty:
-    '\uc544\uc9c1\u0020\uac8c\uc2dc\uae00\uc774\u0020\uc5c6\uc2b5\ub2c8\ub2e4\u002e\u0020\uccab\u0020\uae00\uc744\u0020\uc791\uc131\ud574\ubcf4\uc138\uc694\u0021',
+  anonymous: '익명',
+  edit: '수정',
+  remove: '삭제',
+  like: '좋아요',
+  dislike: '싫어요',
+  empty: '아직 게시글이 없습니다. 첫 글을 작성해보세요!',
 };
 
 function PostCard({

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { deleteComment, editComment } from '../api';
 
 const TEXT = {
-  empty: '\uccab\u0020\ub313\uae00\uc744\u0020\ub0a8\uaca8\ubcf4\uc138\uc694\u002e',
-  confirmDelete: '\ub313\uae00\uc744\u0020\uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c\u003f',
-  deleteFail: '\uc0ad\uc81c\u0020\uc2e4\ud328',
-  editFail: '\uc218\uc815\u0020\uc2e4\ud328',
-  cancel: '\ucde8\uc18c',
-  save: '\uc800\uc7a5',
-  edit: '\uc218\uc815',
-  remove: '\uc0ad\uc81c',
+  empty: '첫 댓글을 남겨보세요.',
+  confirmDelete: '댓글을 삭제하시겠습니까?',
+  deleteFail: '삭제 실패',
+  editFail: '수정 실패',
+  cancel: '취소',
+  save: '저장',
+  edit: '수정',
+  remove: '삭제',
 };
 
 function CommentList({ comments, postId, currentUser, onRefresh }) {

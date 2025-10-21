@@ -12,44 +12,36 @@ import { fetchPosts, deletePost } from '../api';
 const PAGE_SIZE = 5;
 
 const VIEW_LABEL = {
-  home: '\uba54\uc778\u0020\ud53c\ub4dc',
-  today: '\uc624\ub298\uc758\u0020\uc18c\uc2dd',
-  popular: '\uc778\uae30\uae00',
-  search: '\uac80\uc0c9',
-  support: '\uace0\uac1d\uc13c\ud130',
-  category: '\uce74\ud14c\uace0\ub9ac',
+  home: '메인 피드',
+  today: '오늘의 소식',
+  popular: '인기글',
+  search: '검색',
+  support: '고객센터',
+  category: '카테고리',
 };
 
 const TEXT = {
-  confirmDelete:
-    '\uc774\u0020\uac8c\uc2dc\uae00\uc744\u0020\uc815\ub9d0\u0020\uc0ad\uc81c\ud558\uc2dc\uaca0\uc5b4\uc694\u003f\u0020\ub418\ub3cc\ub9b4\u0020\uc218\u0020\uc5c6\uc5b4\uc694\u002e',
-  deleteFail: '\uc0ad\uc81c\u0020\uc2e4\ud328',
-  todayTitle: '\uc624\ub298\uc758\u0020\uc18c\uc2dd',
-  todaySubtitle:
-    '\ub530\ub048\ub530\ub048\ud55c\u0020\ucd5c\uc2e0\u0020\uae00\uc744\u0020\ubc14\ub85c\u0020\ub9cc\ub098\ubcf4\uc138\uc694\u002e',
-  popularTitle: '\uc778\uae30\uae00',
-  popularSubtitle:
-    '\ucee4\ubba4\ub2c8\ud2f0\uc5d0\uc11c\u0020\uac00\uc7a5\u0020\uc0ac\ub791\ubc1b\uc740\u0020\uc774\uc57c\uae30\ub4e4\uc785\ub2c8\ub2e4\u002e',
-  searchTitle: '\uc81c\ubaa9\uc73c\ub85c\u0020\uac80\uc0c9',
-  searchSubtitle:
-    '\ud0a4\uc6cc\ub4dc\ub97c\u0020\uc785\ub825\ud558\uba74\u0020\uc81c\ubaa9\uc5d0\u0020\ud3ec\ud568\ub41c\u0020\uae00\uc744\u0020\ucc3e\uc544\ub4dc\ub9b4\uac8c\uc694\u002e',
-  searchPlaceholder: '\uc608\u003a\u0020\u004a\u0075\u006e\u0067\u006c\u0065\u0020\uc5c5\ub370\uc774\ud2b8',
-  searchEmptyTitle: '\uac80\uc0c9\uc5b4\ub97c\u0020\uc785\ub825\ud574\u0020\uc8fc\uc138\uc694\u002e',
-  searchEmptyBody:
-    '\uac80\uc0c9\uc740\u0020\uacf5\ubc31\u0020\uc5c6\uc774\u0020\ucd5c\uc18c\u0020\u0031\uae00\uc790\u0020\uc774\uc0c1\u0020\uc785\ub825\ud574\uc57c\u0020\ud574\uc694\u002e',
-  searchNoResultTitle: '\uac80\uc0c9\u0020\uacb0\uacfc\uac00\u0020\uc5c6\uc5b4\uc694\u002e',
-  searchNoResultBody:
-    '\ucca0\uc790\ub97c\u0020\ub2e4\uc2dc\u0020\ud655\uc778\ud558\uac70\ub098\u0020\ub2e4\ub978\u0020\ud0a4\uc6cc\ub4dc\ub85c\u0020\uac80\uc0c9\ud574\ubcf4\uc138\uc694\u002e',
-  supportTitle: '\uace0\uac1d\uc13c\ud130',
-  supportBody:
-    '\u0032\u0030\u0032\u0035\u0020\u0031\u0030\uc6d4\u0020\u0032\u0033\uc77c\ubd80\ub85c\u0020\uc6b4\uc601\uc774\u0020\uc911\uc9c0\ub418\uc5c8\uc2b5\ub2c8\ub2e4\u002e',
-  supportNote:
-    '\uad81\uae08\ud55c\u0020\uc810\uc774\u0020\uc788\ub2e4\uba74\u0020\u004a\u0075\u006e\u0067\u006c\u0065\u0020\ucee4\ubba4\ub2c8\ud2f0\uc5d0\uc11c\u0020\uc11c\ub85c\u0020\ub3c4\uc640\uc8fc\uc138\uc694\u002e',
-  toggleClose: '\uc791\uc131\u0020\ub2eb\uae30',
-  toggleOpen: '\uae00\uc4f0\uae30',
-  welcomeSuffix: '\ub2d8\u0020\ud658\uc601\ud574\uc694',
-  logout: '\ub85c\uadf8\uc544\uc6c3',
-  login: '\ub85c\uadf8\uc778',
+  confirmDelete: '이 게시글을 정말 삭제하시겠어요? 되돌릴 수 없어요.',
+  deleteFail: '삭제 실패',
+  todayTitle: '오늘의 소식',
+  todaySubtitle: '따끈따끈한 최신글을 바로 만나보세요.',
+  popularTitle: '인기글',
+  popularSubtitle: '커뮤니티에서 가장 사랑받은 이야기들입니다.',
+  searchTitle: '제목으로 검색',
+  searchSubtitle: '키워드를 입력하면 제목에 포함된 글을 찾아드릴게요.',
+  searchPlaceholder: '예: Jungle 업데이트',
+  searchEmptyTitle: '검색어를 입력해 주세요.',
+  searchEmptyBody: '검색은 최소 1글자 이상 입력해야 해요.',
+  searchNoResultTitle: '검색 결과가 없어요.',
+  searchNoResultBody: '철자를 다시 확인하거나 다른 키워드로 검색해보세요.',
+  supportTitle: '고객센터',
+  supportBody: '2025 10월 23일부로 운영이 중지되었습니다.',
+  supportNote: '궁금한 점이 있다면 Jungle 커뮤니티에서 서로 도와주세요.',
+  toggleClose: '작성 닫기',
+  toggleOpen: '글쓰기',
+  welcomeSuffix: '님 환영해요',
+  logout: '로그아웃',
+  login: '로그인',
 };
 
 function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
@@ -261,7 +253,7 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
 
   const latestPosts = useMemo(() => {
     return [...decoratedPosts].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
     );
   }, [decoratedPosts]);
 
@@ -277,7 +269,7 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
     if (!searchTerm) return [];
     const keyword = searchTerm.toLowerCase();
     return decoratedPosts.filter((post) =>
-      (post.title || '').toLowerCase().includes(keyword)
+      (post.title || '').toLowerCase().includes(keyword),
     );
   }, [searchTerm, decoratedPosts]);
 
@@ -425,7 +417,9 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
         onSave={handlePostSaved}
         onCancel={() => setShowEditor(false)}
         currentUser={currentUser}
-        editing={selectedPostId ? posts.find((p) => p.id === selectedPostId) : null}
+        editing={
+          selectedPostId ? posts.find((p) => p.id === selectedPostId) : null
+        }
       />
     );
   } else if (selectedPostId) {
@@ -532,10 +526,7 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
       default:
         mainView = (
           <>
-            <PopularPosts
-              posts={decoratedPosts}
-              onOpenPost={handleOpenPost}
-            />
+            <PopularPosts posts={decoratedPosts} onOpenPost={handleOpenPost} />
             <MainContainer
               posts={visiblePosts}
               onOpenPost={handleOpenPost}

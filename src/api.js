@@ -1,5 +1,7 @@
 // simple fetch wrapper that injects Authorization header when token present
-const API_BASE = process.env.REACT_APP_API_URL || '';
+const API_BASE =
+  (process.env.REACT_APP_API_URL && process.env.REACT_APP_API_URL.trim()) ||
+  'http://localhost:5000';
 
 // Debug: print API base at runtime (helps verify env is loaded)
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {

@@ -4,19 +4,18 @@ import { addComment } from '../api';
 import jungleLogo from '../asset/jungle.png';
 
 const TEXT = {
-  back: '\ubaa9\ub85d\uc73c\ub85c',
-  author: '\uc791\uc131\uc790',
-  edit: '\uc218\uc815',
-  remove: '\uc0ad\uc81c',
-  like: '\uc88b\uc544\uc694',
-  dislike: '\uc2eb\uc5b4\uc694',
-  comments: '\ub313\uae00',
-  commentPlaceholder:
-    '\ub313\uae00\uc744\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694',
-  commentSubmit: '\ub4f1\ub85d',
-  commentFail: '\ub313\uae00\u0020\ub4f1\ub85d\u0020\uc2e4\ud328',
-  anonymous: '\uc775\uba85',
-  separator: '\u00b7',
+  back: '목록으로',
+  author: '작성자',
+  edit: '수정',
+  remove: '삭제',
+  like: '좋아요',
+  dislike: '싫어요',
+  comments: '댓글',
+  commentPlaceholder: '댓글을 입력해주세요',
+  commentSubmit: '등록',
+  commentFail: '댓글 등록 실패',
+  anonymous: '익명',
+  separator: '·',
 };
 
 function PostView({

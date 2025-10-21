@@ -1,8 +1,8 @@
 import React from 'react';
 
 const TEXT = {
-  prev: '\uc774\uc804',
-  next: '\ub2e4\uc74c',
+  prev: '이전',
+  next: '다음',
 };
 
 function Pagination({ page, totalPages, onChange }) {
