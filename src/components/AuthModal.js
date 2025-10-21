@@ -68,27 +68,37 @@ function AuthModal({ open, onClose, onLogin }) {
   };
 
   return (
-    <div style={styles.backdrop} onClick={closeWithReset}>
-      <div style={styles.modal} onClick={(event) => event.stopPropagation()}>
-        <h3>{mode === 'login' ? TEXT.login : TEXT.signup}</h3>
+    <div className="auth-modal" onClick={closeWithReset}>
+      <div
+        className="auth-modal__dialog"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <h3 className="auth-modal__title">
+          {mode === 'login' ? TEXT.login : TEXT.signup}
+        </h3>
         <input
+          className="auth-modal__input"
           placeholder={TEXT.idPlaceholder}
           value={id}
           onChange={(event) => setId(event.target.value)}
         />
         <input
+          className="auth-modal__input"
           placeholder={TEXT.pwPlaceholder}
           type="password"
           value={pw}
           onChange={(event) => setPw(event.target.value)}
         />
-        {error && <div style={styles.error}>{error}</div>}
+        {error && <div className="auth-modal__error">{error}</div>}
 
-        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        <div className="auth-modal__actions">
           {mode === 'login' ? (
             <>
-              <button onClick={handleLogin}>{TEXT.login}</button>
+              <button type="button" onClick={handleLogin}>
+                {TEXT.login}
+              </button>
               <button
+                type="button"
                 onClick={() => {
                   resetForm();
                   setMode('signup');
@@ -99,8 +109,11 @@ function AuthModal({ open, onClose, onLogin }) {
             </>
           ) : (
             <>
-              <button onClick={handleSignup}>{TEXT.createAccount}</button>
+              <button type="button" onClick={handleSignup}>
+                {TEXT.createAccount}
+              </button>
               <button
+                type="button"
                 className="btn-secondary"
                 onClick={() => {
                   resetForm();
@@ -116,30 +129,5 @@ function AuthModal({ open, onClose, onLogin }) {
     </div>
   );
 }
-
-const styles = {
-  backdrop: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.4)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 200,
-  },
-  modal: {
-    background: '#fff',
-    padding: 20,
-    borderRadius: 8,
-    minWidth: 320,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-  },
-  error: {
-    color: '#dc2626',
-    fontSize: 12,
-  },
-};
 
 export default AuthModal;

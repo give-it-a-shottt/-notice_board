@@ -86,58 +86,46 @@ function PostEditor({ onSave, onCancel, currentUser, editing }) {
   };
 
   return (
-    <div className="content-card" style={{ marginBottom: 24 }}>
-      <h2 style={{ marginTop: 0, marginBottom: 16 }}>
+    <div className="content-card post-editor">
+      <h2 className="post-editor__title">
         {editing ? TEXT.editTitle : TEXT.newTitle}
       </h2>
       <input
+        className="post-editor__input"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         placeholder={TEXT.titlePlaceholder}
-        style={{ width: '100%', marginBottom: 8 }}
       />
       <input
+        className="post-editor__input"
         value={imageUrl}
         onChange={(event) => setImageUrl(event.target.value)}
         placeholder={TEXT.imagePlaceholder}
-        style={{ width: '100%', marginBottom: 8 }}
       />
       {imageUrl.trim() && (
-        <div
-          style={{
-            marginBottom: 12,
-            borderRadius: 16,
-            overflow: 'hidden',
-            border: '1px solid rgba(148, 163, 184, 0.22)',
-            background: 'rgba(15, 23, 42, 0.04)',
-          }}
-        >
+        <div className="post-editor__preview">
           <img
             src={imageUrl}
             alt={TEXT.previewAlt}
-            style={{ width: '100%', maxHeight: 220, objectFit: 'cover' }}
           />
         </div>
       )}
       <textarea
+        className="post-editor__textarea"
         value={content}
         onChange={(event) => setContent(event.target.value)}
         placeholder={TEXT.contentPlaceholder}
         rows={6}
-        style={{ width: '100%' }}
       />
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          marginTop: 12,
-          gap: 8,
-        }}
-      >
-        <button className="btn-secondary" onClick={handleCancel}>
+      <div className="post-editor__actions">
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={handleCancel}
+        >
           {TEXT.cancel}
         </button>
-        <button onClick={handleSave}>
+        <button type="button" onClick={handleSave}>
           {editing ? TEXT.update : TEXT.submit}
         </button>
       </div>

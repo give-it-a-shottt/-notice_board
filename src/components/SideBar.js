@@ -42,6 +42,12 @@ const renderButton = (item, activeView, onChangeView) => (
 );
 
 function SideBar({ activeView = 'home', onChangeView = () => {} }) {
+  const categoryActive = activeView === 'category';
+
+  const handleCategoryClick = () => {
+    onChangeView(categoryActive ? '' : 'category');
+  };
+
   return (
     <aside className="SideBar">
       <div className="sidebar">
@@ -51,8 +57,18 @@ function SideBar({ activeView = 'home', onChangeView = () => {} }) {
             renderButton(item, activeView, onChangeView)
           )}
 
-          <div className="menu-group" aria-haspopup="true">
-            <button type="button" className="menu-item menu-item--group">
+          <div
+            className={`menu-group${categoryActive ? ' is-active' : ''}`}
+            aria-haspopup="true"
+            aria-expanded={categoryActive}
+          >
+            <button
+              type="button"
+              className={`menu-item menu-item--group${
+                categoryActive ? ' is-active' : ''
+              }`}
+              onClick={handleCategoryClick}
+            >
               <span className="menu-item__label">{TEXT.category}</span>
               <span className="menu-item__hint">{TEXT.explore}</span>
             </button>

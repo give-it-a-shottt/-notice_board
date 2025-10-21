@@ -12,22 +12,14 @@ function Pagination({ page, totalPages, onChange }) {
   const goNext = () => onChange(Math.min(totalPages, page + 1));
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 12,
-      }}
-    >
-      <button onClick={goPrev} disabled={page === 1}>
+    <div className="pagination">
+      <button type="button" onClick={goPrev} disabled={page === 1}>
         {TEXT.prev}
       </button>
-      <div>
+      <span className="pagination__page">
         {page} / {totalPages}
-      </div>
-      <button onClick={goNext} disabled={page === totalPages}>
+      </span>
+      <button type="button" onClick={goNext} disabled={page === totalPages}>
         {TEXT.next}
       </button>
     </div>

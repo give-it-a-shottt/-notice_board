@@ -17,7 +17,7 @@ function CommentList({ comments, postId, currentUser, onRefresh }) {
   const [editText, setEditText] = useState('');
 
   if (!comments || comments.length === 0) {
-    return <div style={{ color: '#666' }}>{TEXT.empty}</div>;
+    return <div className="comment-list__empty">{TEXT.empty}</div>;
   }
 
   const handleDelete = async (comment) => {
@@ -52,7 +52,7 @@ function CommentList({ comments, postId, currentUser, onRefresh }) {
   };
 
   return (
-    <ul style={{ listStyle: 'none', padding: 0 }}>
+    <ul className="comment-list">
       {comments.map((comment) => {
         const id = comment._id || comment.id;
         const isAuthor =
@@ -61,49 +61,49 @@ function CommentList({ comments, postId, currentUser, onRefresh }) {
             currentUser.username ===
               (comment.author?.username || comment.author));
         return (
-          <li
-            key={id}
-            style={{ padding: '8px 0', borderBottom: '1px solid #eee' }}
-          >
-            <div style={{ fontSize: 12, color: '#666' }}>
+          <li key={id} className="comment-list__item">
+            <div className="comment-list__meta">
               {comment.author?.username || comment.author} -{' '}
               {new Date(comment.createdAt).toLocaleString()}
             </div>
             {editingId === id ? (
-              <div>
+              <div className="comment-list__edit">
                 <textarea
+                  className="comment-list__textarea"
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
-                  style={{ width: '100%' }}
                 />
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 8,
-                    justifyContent: 'flex-end',
-                    marginTop: 8,
-                  }}
-                >
-                  <button className="btn-secondary" onClick={cancelEdit}>
+                <div className="comment-list__actions">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={cancelEdit}
+                  >
                     {TEXT.cancel}
                   </button>
-                  <button onClick={() => submitEdit(comment)}>
+                  <button type="button" onClick={() => submitEdit(comment)}>
                     {TEXT.save}
                   </button>
                 </div>
               </div>
             ) : (
-              <div>
-                <div>{comment.content || comment.text}</div>
+              <div className="comment-list__content">
+                <div className="comment-list__body">
+                  {comment.content || comment.text}
+                </div>
                 {isAuthor && (
-                  <div style={{ marginTop: 6, display: 'flex', gap: 8 }}>
+                  <div className="comment-list__author-actions">
                     <button
+                      type="button"
                       className="btn-secondary"
                       onClick={() => startEdit(comment)}
                     >
                       {TEXT.edit}
                     </button>
-                    <button onClick={() => handleDelete(comment)}>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(comment)}
+                    >
                       {TEXT.remove}
                     </button>
                   </div>

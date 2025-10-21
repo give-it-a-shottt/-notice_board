@@ -17,6 +17,7 @@ const VIEW_LABEL = {
   popular: '\uc778\uae30\uae00',
   search: '\uac80\uc0c9',
   support: '\uace0\uac1d\uc13c\ud130',
+  category: '\uce74\ud14c\uace0\ub9ac',
 };
 
 const TEXT = {
@@ -566,35 +567,40 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
 
         <div className="top-bar__view">{viewTitle}</div>
 
-        <div
-          style={{
-            marginLeft: 'auto',
-            display: 'flex',
-            gap: 8,
-            alignItems: 'center',
-          }}
-        >
-          <button className="login" onClick={toggleEditor}>
+        <div className="top-bar__actions">
+          <button
+            type="button"
+            className="top-bar__button top-bar__button--primary"
+            onClick={toggleEditor}
+          >
             {showEditor ? TEXT.toggleClose : TEXT.toggleOpen}
           </button>
           {currentUser ? (
             <>
-              <div style={{ marginLeft: 12, color: '#e2e8f0' }}>
+              <span className="top-bar__welcome">
                 {`${currentUser.username || currentUser}${TEXT.welcomeSuffix}`}
-              </div>
-              <button className="login" onClick={handleLogout}>
+              </span>
+              <button
+                type="button"
+                className="top-bar__button top-bar__button--ghost"
+                onClick={handleLogout}
+              >
                 {TEXT.logout}
               </button>
             </>
           ) : (
-            <button className="login" onClick={() => setAuthOpen(true)}>
+            <button
+              type="button"
+              className="top-bar__button top-bar__button--ghost"
+              onClick={() => setAuthOpen(true)}
+            >
               {TEXT.login}
             </button>
           )}
         </div>
       </div>
 
-      <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="memo-body">
         {mainView}
 
         {showPagination && (

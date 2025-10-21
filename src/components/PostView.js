@@ -59,16 +59,16 @@ function PostView({
   const heroImage = post.imageUrl || jungleLogo;
 
   return (
-    <div className="content-card">
+    <div className="content-card post-view">
       <button
-        className="btn-secondary"
+        type="button"
+        className="btn-secondary post-view__back"
         onClick={onBack}
-        style={{ marginBottom: 12 }}
       >
         {TEXT.back}
       </button>
-      <h2>{post.title}</h2>
-      <div style={{ color: 'rgba(17, 24, 39, 0.6)', marginBottom: 16 }}>
+      <h2 className="post-view__title">{post.title}</h2>
+      <div className="post-view__meta">
         {TEXT.author}{' '}
         {post.author?.username || post.author || TEXT.anonymous}{' '}
         {TEXT.separator}{' '}
@@ -76,16 +76,17 @@ function PostView({
         {currentUser &&
           (currentUser.username || currentUser) ===
             (post.author?.username || post.author) && (
-            <span style={{ marginLeft: 12 }}>
+            <span className="post-view__meta-actions">
               <button
+                type="button"
                 className="btn-secondary"
                 onClick={() => onEditPost && onEditPost(post)}
               >
                 {TEXT.edit}
               </button>
               <button
+                type="button"
                 onClick={() => onDeletePost && onDeletePost(post)}
-                style={{ marginLeft: 8 }}
               >
                 {TEXT.remove}
               </button>
@@ -93,18 +94,10 @@ function PostView({
           )}
       </div>
 
-      <div
-        style={{
-          borderRadius: 20,
-          overflow: 'hidden',
-          border: '1px solid rgba(148, 163, 184, 0.25)',
-          marginBottom: 18,
-        }}
-      >
+      <div className="post-view__hero">
         <img
           src={heroImage}
           alt={post.title}
-          style={{ width: '100%', maxHeight: 360, objectFit: 'cover' }}
           onError={(event) => {
             event.currentTarget.src = jungleLogo;
           }}
@@ -138,11 +131,11 @@ function PostView({
         </button>
       </div>
 
-      <div style={{ whiteSpace: 'pre-wrap', marginBottom: 24, marginTop: 16 }}>
+      <div className="post-view__body">
         {post.body || post.content}
       </div>
 
-      <h4>{TEXT.comments}</h4>
+      <h4 className="post-view__comments-title">{TEXT.comments}</h4>
       <CommentList
         comments={post.comments || []}
         postId={post._id || post.id}
@@ -150,14 +143,15 @@ function PostView({
         onRefresh={onRefresh}
       />
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+      <div className="post-view__comment-form">
         <input
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder={TEXT.commentPlaceholder}
-          style={{ flex: 1 }}
         />
-        <button onClick={handleComment}>{TEXT.commentSubmit}</button>
+        <button type="button" onClick={handleComment}>
+          {TEXT.commentSubmit}
+        </button>
       </div>
     </div>
   );
