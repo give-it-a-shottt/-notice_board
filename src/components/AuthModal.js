@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import { register, login } from '../api';
 import { setAuth } from '../auth';
 
+const TEXT = {
+  login: '\ub85c\uadf8\uc778',
+  signup: '\ud68c\uc6d0\uac00\uc785',
+  idPlaceholder: '\uc544\uc774\ub514',
+  pwPlaceholder: '\ube44\ubc00\ubc88\ud638',
+  requireBoth:
+    '\uc544\uc774\ub514\uc640\u0020\ube44\ubc00\ubc88\ud638\ub97c\u0020\ubaa8\ub450\u0020\uc785\ub825\ud574\uc8fc\uc138\uc694\u002e',
+  signupDone:
+    '\ud68c\uc6d0\uac00\uc785\uc774\u0020\uc644\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4\u002e\u0020\ub85c\uadf8\uc778\ud574\u0020\uc8fc\uc138\uc694\u002e',
+  signupFail: '\ud68c\uc6d0\uac00\uc785\u0020\uc2e4\ud328',
+  loginFail: '\ub85c\uadf8\uc778\u0020\uc2e4\ud328',
+  createAccount: '\uacc4\uc815\u0020\ub9cc\ub4e4\uae30',
+  back: '\ub4a4\ub85c\uac00\uae30',
+};
+
 function AuthModal({ open, onClose, onLogin }) {
   const [mode, setMode] = useState('login');
   const [id, setId] = useState('');
@@ -18,22 +33,22 @@ function AuthModal({ open, onClose, onLogin }) {
 
   const handleSignup = async () => {
     if (!id || !pw) {
-      setError('아이디와 비밀번호를 모두 입력해주세요.');
+      setError(TEXT.requireBoth);
       return;
     }
     try {
       await register(id, pw);
-      alert('회원가입이 완료되었습니다. 로그인해 주세요.');
+      alert(TEXT.signupDone);
       resetForm();
       setMode('login');
     } catch (err) {
-      setError(err.response?.message || err.message || '회원가입 실패');
+      setError(err.response?.message || err.message || TEXT.signupFail);
     }
   };
 
   const handleLogin = async () => {
     if (!id || !pw) {
-      setError('아이디와 비밀번호를 모두 입력해주세요.');
+      setError(TEXT.requireBoth);
       return;
     }
     try {
@@ -43,7 +58,7 @@ function AuthModal({ open, onClose, onLogin }) {
       resetForm();
       onClose();
     } catch (err) {
-      setError(err.response?.message || err.message || '로그인 실패');
+      setError(err.response?.message || err.message || TEXT.loginFail);
     }
   };
 
@@ -55,14 +70,14 @@ function AuthModal({ open, onClose, onLogin }) {
   return (
     <div style={styles.backdrop} onClick={closeWithReset}>
       <div style={styles.modal} onClick={(event) => event.stopPropagation()}>
-        <h3>{mode === 'login' ? '로그인' : '회원가입'}</h3>
+        <h3>{mode === 'login' ? TEXT.login : TEXT.signup}</h3>
         <input
-          placeholder="아이디"
+          placeholder={TEXT.idPlaceholder}
           value={id}
           onChange={(event) => setId(event.target.value)}
         />
         <input
-          placeholder="비밀번호"
+          placeholder={TEXT.pwPlaceholder}
           type="password"
           value={pw}
           onChange={(event) => setPw(event.target.value)}
@@ -72,19 +87,19 @@ function AuthModal({ open, onClose, onLogin }) {
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
           {mode === 'login' ? (
             <>
-              <button onClick={handleLogin}>로그인</button>
+              <button onClick={handleLogin}>{TEXT.login}</button>
               <button
                 onClick={() => {
                   resetForm();
                   setMode('signup');
                 }}
               >
-                회원가입
+                {TEXT.signup}
               </button>
             </>
           ) : (
             <>
-              <button onClick={handleSignup}>계정 만들기</button>
+              <button onClick={handleSignup}>{TEXT.createAccount}</button>
               <button
                 className="btn-secondary"
                 onClick={() => {
@@ -92,7 +107,7 @@ function AuthModal({ open, onClose, onLogin }) {
                   setMode('login');
                 }}
               >
-                뒤로가기
+                {TEXT.back}
               </button>
             </>
           )}

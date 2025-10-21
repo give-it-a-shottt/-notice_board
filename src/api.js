@@ -47,17 +47,23 @@ export async function fetchPosts() {
   return request('/api/posts');
 }
 
-export async function createPost(title, body) {
+export async function createPost(title, body, imageUrl) {
+  const payload = { title, body };
+  if (imageUrl) payload.imageUrl = imageUrl;
   return request('/api/posts', {
     method: 'POST',
-    body: JSON.stringify({ title, body }),
+    body: JSON.stringify(payload),
   });
 }
 
 export async function editPost(id, updates) {
+  const payload = { ...updates };
+  if (Object.prototype.hasOwnProperty.call(payload, 'imageUrl')) {
+    if (!payload.imageUrl) payload.imageUrl = null;
+  }
   return request(`/api/posts/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(updates),
+    body: JSON.stringify(payload),
   });
 }
 
