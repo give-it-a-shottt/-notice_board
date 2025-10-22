@@ -60,6 +60,16 @@ function AuthModal({ open, onClose, onLogin }) {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    if (mode === 'login') {
+      handleLogin();
+    } else {
+      handleSignup();
+    }
+  };
+
   const closeWithReset = () => {
     resetForm();
     onClose();
@@ -79,6 +89,7 @@ function AuthModal({ open, onClose, onLogin }) {
           placeholder={TEXT.idPlaceholder}
           value={id}
           onChange={(event) => setId(event.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <input
           className="auth-modal__input"
@@ -86,6 +97,7 @@ function AuthModal({ open, onClose, onLogin }) {
           type="password"
           value={pw}
           onChange={(event) => setPw(event.target.value)}
+          onKeyDown={handleKeyDown}
         />
         {error && <div className="auth-modal__error">{error}</div>}
 

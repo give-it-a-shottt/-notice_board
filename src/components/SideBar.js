@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 const TEXT = {
   mainFeed: '메인 피드',
   latestNews: '오늘의 소식',
@@ -11,9 +13,14 @@ const TEXT = {
   primaryMenu: '주 메뉴',
   category: '카테고리',
   explore: '둘러보기',
+  myPosts: '내가 쓴 글',
+  myPostsHint: '내가 쓴 글 페이지',
   game: '게임',
+  gameHint: '게임 게시판',
+  study: '공부',
+  studyHint: '공부 게시판',
   dev: '개발',
-  chat: '잡답방',
+  devHint: '개발 게시판',
 };
 const PRIMARY_ITEMS = [
   { id: 'home', label: TEXT.mainFeed, hint: '전체 피드' },
@@ -26,7 +33,12 @@ const TAIL_ITEMS = [
   { id: 'support', label: TEXT.support, hint: TEXT.supportHint },
 ];
 
-const CATEGORIES = [TEXT.game, TEXT.dev, TEXT.chat];
+const CATEGORY_ITEMS = [
+  { id: 'myPosts', label: TEXT.myPosts, hint: TEXT.myPostsHint },
+  { id: 'gameBoard', label: TEXT.game, hint: TEXT.gameHint },
+  { id: 'studyBoard', label: TEXT.study, hint: TEXT.studyHint },
+  { id: 'devBoard', label: TEXT.dev, hint: TEXT.devHint },
+];
 
 const renderButton = (item, activeView, onChangeView) => (
   <button
@@ -41,11 +53,57 @@ const renderButton = (item, activeView, onChangeView) => (
 );
 
 function SideBar({ activeView = 'home', onChangeView = () => {} }) {
-  const categoryActive = activeView === 'category';
+  const categoryIds = useMemo(
+    () => CATEGORY_ITEMS.map((item) => item.id),
+    [],
+  );
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const menuGroupRef = useRef(null);
+  const selectedCategoryId = categoryIds.includes(activeView)
+    ? activeView
+    : null;
+  const groupExpanded = categoryOpen && CATEGORY_ITEMS.length > 0;
+
+  useEffect(() => {
+    if (!selectedCategoryId) {
+      setCategoryOpen(false);
+    }
+  }, [selectedCategoryId]);
+
+  useEffect(() => {
+    if (!groupExpanded) return;
+    const handlePointerDown = (event) => {
+      if (
+        menuGroupRef.current &&
+        !menuGroupRef.current.contains(event.target)
+      ) {
+        setCategoryOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [groupExpanded]);
 
   const handleCategoryClick = () => {
-    onChangeView(categoryActive ? '' : 'category');
+    const nextOpen = !categoryOpen;
+    setCategoryOpen(nextOpen);
+    if (nextOpen && !selectedCategoryId && CATEGORY_ITEMS.length > 0) {
+      onChangeView(CATEGORY_ITEMS[0].id);
+    }
   };
+
+  const handleSelectCategory = (id) => {
+    onChangeView(id);
+    setCategoryOpen(false);
+  };
+
+  const menuGroupClassName = [
+    'menu-group',
+    groupExpanded ? 'is-active' : '',
+    selectedCategoryId ? 'has-selection' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <aside className="SideBar">
@@ -57,25 +115,35 @@ function SideBar({ activeView = 'home', onChangeView = () => {} }) {
           )}
 
           <div
-            className={`menu-group${categoryActive ? ' is-active' : ''}`}
-            aria-haspopup="true"
-            aria-expanded={categoryActive}
+            ref={menuGroupRef}
+            className={menuGroupClassName}
+            data-open={groupExpanded ? 'true' : 'false'}
           >
             <button
               type="button"
               className={`menu-item menu-item--group${
-                categoryActive ? ' is-active' : ''
-              }`}
+                groupExpanded ? ' is-active' : ''
+              }${selectedCategoryId ? ' is-selected' : ''}`}
+              aria-haspopup="true"
+              aria-expanded={groupExpanded}
               onClick={handleCategoryClick}
             >
               <span className="menu-item__label">{TEXT.category}</span>
               <span className="menu-item__hint">{TEXT.explore}</span>
             </button>
             <div className="menu-sub">
-              {CATEGORIES.map((category) => (
-                <span key={category} className="menu-sub__item">
-                  {category}
-                </span>
+              {CATEGORY_ITEMS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`menu-sub__item${
+                    activeView === item.id ? ' is-active' : ''
+                  }`}
+                  onClick={() => handleSelectCategory(item.id)}
+                >
+                  <span className="menu-sub__label">{item.label}</span>
+                  <span className="menu-sub__hint">{item.hint}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -90,3 +158,7 @@ function SideBar({ activeView = 'home', onChangeView = () => {} }) {
 }
 
 export default SideBar;
+
+
+
+

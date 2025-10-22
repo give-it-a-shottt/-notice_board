@@ -8,6 +8,7 @@ const TEXT = {
   like: '좋아요',
   dislike: '싫어요',
   empty: '아직 게시글이 없습니다. 첫 글을 작성해보세요!',
+  views: '조회수',
 };
 
 function PostCard({
@@ -24,6 +25,7 @@ function PostCard({
     currentUsername === (post.author || post.authorObj?.username);
   const likes = typeof post.likes === 'number' ? post.likes : 0;
   const dislikes = typeof post.dislikes === 'number' ? post.dislikes : 0;
+  const views = typeof post.views === 'number' ? post.views : 0;
   const viewerReaction =
     post.viewerReaction &&
     (post.viewerReaction === 'like' || post.viewerReaction === 'dislike')
@@ -61,7 +63,15 @@ function PostCard({
             <span className="company">{post.author || TEXT.anonymous}</span>
             <strong>{post.title}</strong>
             <p>{preview}</p>
-            <time>{new Date(post.createdAt).toLocaleString()}</time>
+            <div className="post-meta">
+              <time>{new Date(post.createdAt).toLocaleString()}</time>
+              <span className="post-meta__divider" aria-hidden="true">
+                ·
+              </span>
+              <span className="post-meta__views">
+                {TEXT.views} {views.toLocaleString()}
+              </span>
+            </div>
           </div>
         </button>
 

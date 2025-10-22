@@ -49,9 +49,14 @@ export async function fetchPosts() {
   return request('/api/posts');
 }
 
-export async function createPost(title, body, imageUrl) {
+export async function createPost(title, body, imageUrl, category) {
   const payload = { title, body };
   if (imageUrl) payload.imageUrl = imageUrl;
+  if (typeof category === 'string') {
+    const trimmed = category.trim();
+    if (trimmed) payload.category = trimmed.toLowerCase();
+    else payload.category = '';
+  }
   return request('/api/posts', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -63,6 +68,9 @@ export async function editPost(id, updates) {
   if (Object.prototype.hasOwnProperty.call(payload, 'imageUrl')) {
     if (!payload.imageUrl) payload.imageUrl = null;
   }
+  if (Object.prototype.hasOwnProperty.call(payload, 'category')) {
+    if (!payload.category) payload.category = null;
+  }
   return request(`/api/posts/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
@@ -71,6 +79,10 @@ export async function editPost(id, updates) {
 
 export async function deletePost(id) {
   return request(`/api/posts/${id}`, { method: 'DELETE' });
+}
+
+export async function incrementPostViews(id) {
+  return request(`/api/posts/${id}/views`, { method: 'POST' });
 }
 
 export async function addComment(postId, content) {

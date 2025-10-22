@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import '../App.css';
 import MainContainer from './MainContainer';
 import AuthModal from './AuthModal';
@@ -7,9 +7,21 @@ import PostView from './PostView';
 import Pagination from './Pagination';
 import PopularPosts from './PopularPosts';
 import { getUser, clearAuth } from '../auth';
-import { fetchPosts, deletePost } from '../api';
+import { fetchPosts, deletePost, incrementPostViews } from '../api';
 
 const PAGE_SIZE = 5;
+
+const CATEGORY_VIEW_MAP = {
+  gameBoard: 'game',
+  studyBoard: 'study',
+  devBoard: 'dev',
+};
+const VALID_CATEGORY_VALUES = new Set(Object.values(CATEGORY_VIEW_MAP));
+
+const POPULAR_SORT_OPTIONS = [
+  { id: 'views', labelKey: 'sortViews' },
+  { id: 'likes', labelKey: 'sortLikes' },
+];
 
 const VIEW_LABEL = {
   home: '메인 피드',
@@ -17,7 +29,10 @@ const VIEW_LABEL = {
   popular: '인기글',
   search: '검색',
   support: '고객센터',
-  category: '카테고리',
+  myPosts: '내가 쓴 글',
+  gameBoard: '게임 게시판',
+  studyBoard: '공부 게시판',
+  devBoard: '개발 게시판',
 };
 
 const TEXT = {
@@ -26,7 +41,7 @@ const TEXT = {
   todayTitle: '오늘의 소식',
   todaySubtitle: '따끈따끈한 최신글을 바로 만나보세요.',
   popularTitle: '인기글',
-  popularSubtitle: '커뮤니티에서 가장 사랑받은 이야기들입니다.',
+  popularSubtitle: '조회순과 좋아요순 중 원하는 기준으로 정렬해보세요.',
   searchTitle: '제목으로 검색',
   searchSubtitle: '키워드를 입력하면 제목에 포함된 글을 찾아드릴게요.',
   searchPlaceholder: '예: Jungle 업데이트',
@@ -37,6 +52,17 @@ const TEXT = {
   supportTitle: '고객센터',
   supportBody: '2025 10월 23일부로 운영이 중지되었습니다.',
   supportNote: '궁금한 점이 있다면 Jungle 커뮤니티에서 서로 도와주세요.',
+  myPostsTitle: '내가 쓴 글 페이지',
+  myPostsSubtitle: '내가 작성한 게시글만 모아봤어요.',
+  myPostsNeedLogin: '로그인하면 내가 쓴 글을 한눈에 볼 수 있어요.',
+  gameTitle: '게임 게시판 페이지',
+  gameSubtitle: '최신 게임 소식과 공략을 공유해 보세요.',
+  studyTitle: '공부 게시판 페이지',
+  studySubtitle: '공부 기록과 팁을 함께 나눠요.',
+  devTitle: '개발 게시판 페이지',
+  devSubtitle: '개발 관련 소식과 노하우를 공유해요.',
+  sortViews: '조회순',
+  sortLikes: '좋아요순',
   toggleClose: '작성 닫기',
   toggleOpen: '글쓰기',
   welcomeSuffix: '님 환영해요',
@@ -63,6 +89,72 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
   });
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [popularSort, setPopularSort] = useState('views');
+
+  const currentUsername =
+    currentUser && (currentUser.username || currentUser) ?
+      currentUser.username || currentUser :
+      '';
+  const isLoggedIn = Boolean(currentUsername);
+
+  const mapServerPost = useCallback((post) => {
+    if (!post) return null;
+    const rawCategory =
+      typeof post.category === 'string'
+        ? post.category
+        : typeof post.metadata?.category === 'string'
+        ? post.metadata.category
+        : '';
+    const normalizedCategory = rawCategory
+      ? rawCategory.toString().trim().toLowerCase()
+      : '';
+    const categoryValue = VALID_CATEGORY_VALUES.has(normalizedCategory)
+      ? normalizedCategory
+      : '';
+
+    return {
+      _id: post._id,
+      id: post._id,
+      title: post.title || '',
+      body: post.body || '',
+      content: post.body || '',
+      imageUrl: post.imageUrl || (post.assets && post.assets.cover) || '',
+      author:
+        post.author && post.author.username
+          ? post.author.username
+          : post.author || '',
+      authorObj: post.author,
+      createdAt: post.createdAt,
+      category: categoryValue,
+      views:
+        typeof post.views === 'number'
+          ? post.views
+          : typeof post.metrics?.views === 'number'
+          ? post.metrics.views
+          : 0,
+      likes:
+        typeof post.likes === 'number'
+          ? post.likes
+          : typeof post.reactions?.likes === 'number'
+          ? post.reactions.likes
+          : 0,
+      dislikes:
+        typeof post.dislikes === 'number'
+          ? post.dislikes
+          : typeof post.reactions?.dislikes === 'number'
+          ? post.reactions.dislikes
+          : 0,
+      comments: Array.isArray(post.comments) ? post.comments : [],
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.removeItem('mp_post_views');
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     loadPosts();
@@ -104,40 +196,9 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
   async function loadPosts() {
     try {
       const data = await fetchPosts();
-      const mapped = (data || []).map((p) => ({
-        _id: p._id,
-        id: p._id,
-        title: p.title,
-        body: p.body,
-        content: p.body,
-        imageUrl: p.imageUrl || (p.assets && p.assets.cover) || '',
-        author:
-          p.author && p.author.username ? p.author.username : p.author || '',
-        authorObj: p.author,
-        createdAt: p.createdAt,
-        likes:
-          typeof p.likes === 'number'
-            ? p.likes
-            : typeof p.reactions?.likes === 'number'
-            ? p.reactions.likes
-            : 0,
-        dislikes:
-          typeof p.dislikes === 'number'
-            ? p.dislikes
-            : typeof p.reactions?.dislikes === 'number'
-            ? p.reactions.dislikes
-            : 0,
-        comments: (p.comments || []).map((c) => ({
-          _id: c._id,
-          id: c._id,
-          content: c.content,
-          text: c.content,
-          author:
-            c.author && c.author.username ? c.author.username : c.author || '',
-          authorObj: c.author,
-          createdAt: c.createdAt,
-        })),
-      }));
+      const mapped = (data || [])
+        .map(mapServerPost)
+        .filter((post) => post && post.id);
       setPosts(mapped);
     } catch (err) {
       console.error('Failed to load posts', err);
@@ -220,11 +281,13 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
     });
   }, [posts]);
 
+
   const decoratedPosts = useMemo(() => {
     return posts.map((post) => {
       const reaction = reactions[post.id] || {};
       return {
         ...post,
+        views: Math.max(typeof post.views === 'number' ? post.views : 0, 0),
         likes:
           typeof reaction.likes === 'number'
             ? reaction.likes
@@ -246,6 +309,29 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
     });
   }, [posts, reactions]);
 
+  const myPosts = useMemo(() => {
+    if (!currentUsername) return [];
+    return decoratedPosts.filter((post) => {
+      const authorName =
+        post.author ||
+        post.authorObj?.username ||
+        post.authorObj?.name ||
+        '';
+      return authorName === currentUsername;
+    });
+  }, [decoratedPosts, currentUsername]);
+
+  const getCategoryPosts = useCallback(
+    (viewId) => {
+      const categoryValue = CATEGORY_VIEW_MAP[viewId];
+      if (!categoryValue) return [];
+      return decoratedPosts.filter(
+        (post) => post.category === categoryValue,
+      );
+    },
+    [decoratedPosts],
+  );
+
   const visiblePosts = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return decoratedPosts.slice(start, start + PAGE_SIZE);
@@ -258,12 +344,33 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
   }, [decoratedPosts]);
 
   const popularFeed = useMemo(() => {
+    const activeSort = popularSort === 'likes' ? 'likes' : 'views';
+    const getTime = (value) => {
+      const time = value ? new Date(value).getTime() : 0;
+      return Number.isFinite(time) ? time : 0;
+    };
+
     return [...decoratedPosts].sort((a, b) => {
-      const likeDiff = (b.likes || 0) - (a.likes || 0);
-      if (likeDiff !== 0) return likeDiff;
-      return new Date(b.createdAt) - new Date(a.createdAt);
+      const aLikes = typeof a.likes === 'number' ? a.likes : 0;
+      const bLikes = typeof b.likes === 'number' ? b.likes : 0;
+      const aViews = typeof a.views === 'number' ? a.views : 0;
+      const bViews = typeof b.views === 'number' ? b.views : 0;
+
+      if (activeSort === 'likes') {
+        const likeDiff = bLikes - aLikes;
+        if (likeDiff !== 0) return likeDiff;
+        const viewDiff = bViews - aViews;
+        if (viewDiff !== 0) return viewDiff;
+      } else {
+        const viewDiff = bViews - aViews;
+        if (viewDiff !== 0) return viewDiff;
+        const likeDiff = bLikes - aLikes;
+        if (likeDiff !== 0) return likeDiff;
+      }
+
+      return getTime(b.createdAt) - getTime(a.createdAt);
     });
-  }, [decoratedPosts]);
+  }, [decoratedPosts, popularSort]);
 
   const searchResults = useMemo(() => {
     if (!searchTerm) return [];
@@ -336,9 +443,34 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
     }
   };
 
-  const handleOpenPost = (post) => {
+  const handleOpenPost = async (post) => {
+    if (!post || !post.id) return;
     setShowEditor(false);
     setSelectedPostId(post.id);
+    try {
+      const updated = await incrementPostViews(post.id);
+      const mapped = mapServerPost(updated);
+      if (mapped && mapped.id) {
+        let replaced = false;
+        setPosts((prev) => {
+          const next = prev.map((item) => {
+            if (item.id === mapped.id) {
+              replaced = true;
+              return { ...item, ...mapped };
+            }
+            return item;
+          });
+          return replaced ? next : prev;
+        });
+        if (!replaced) {
+          await loadPosts();
+        }
+      } else {
+        await loadPosts();
+      }
+    } catch (err) {
+      console.error('Failed to increment post views', err);
+    }
   };
 
   const handleClosePost = () => setSelectedPostId(null);
@@ -463,6 +595,23 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
             <div className="content-card info-card">
               <h2>{TEXT.popularTitle}</h2>
               <p>{TEXT.popularSubtitle}</p>
+              <div className="popular-section__controls popular-section__controls--inline">
+                {POPULAR_SORT_OPTIONS.map((option) => {
+                  const isActive = popularSort === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`popular-sort-button${
+                        isActive ? ' is-active' : ''
+                      }`}
+                      onClick={() => setPopularSort(option.id)}
+                    >
+                      {TEXT[option.labelKey]}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <MainContainer
               posts={popularFeed}
@@ -475,6 +624,97 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
           </>
         );
         break;
+      case 'myPosts':
+        mainView = isLoggedIn ? (
+          <>
+            <div className="content-card info-card">
+              <h2>{TEXT.myPostsTitle}</h2>
+              <p>{TEXT.myPostsSubtitle}</p>
+            </div>
+            <MainContainer
+              posts={myPosts}
+              onOpenPost={handleOpenPost}
+              onEditPost={handleEditPost}
+              onDeletePost={handleDeletePost}
+              onReactPost={handleReactPost}
+              currentUser={currentUser}
+            />
+          </>
+        ) : (
+          <div className="content-card info-card">
+            <h2>{TEXT.myPostsTitle}</h2>
+            <p>{TEXT.myPostsNeedLogin}</p>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ marginTop: 12 }}
+              onClick={() => setAuthOpen(true)}
+            >
+              {TEXT.login}
+            </button>
+          </div>
+        );
+        break;
+      case 'gameBoard': {
+        const boardPosts = getCategoryPosts('gameBoard');
+        mainView = (
+          <>
+            <div className="content-card info-card">
+              <h2>{TEXT.gameTitle}</h2>
+              <p>{TEXT.gameSubtitle}</p>
+            </div>
+            <MainContainer
+              posts={boardPosts}
+              onOpenPost={handleOpenPost}
+              onEditPost={handleEditPost}
+              onDeletePost={handleDeletePost}
+              onReactPost={handleReactPost}
+              currentUser={currentUser}
+            />
+          </>
+        );
+        break;
+      }
+      case 'studyBoard': {
+        const boardPosts = getCategoryPosts('studyBoard');
+        mainView = (
+          <>
+            <div className="content-card info-card">
+              <h2>{TEXT.studyTitle}</h2>
+              <p>{TEXT.studySubtitle}</p>
+            </div>
+            <MainContainer
+              posts={boardPosts}
+              onOpenPost={handleOpenPost}
+              onEditPost={handleEditPost}
+              onDeletePost={handleDeletePost}
+              onReactPost={handleReactPost}
+              currentUser={currentUser}
+            />
+          </>
+        );
+        break;
+      }
+      case 'devBoard': {
+        const boardPosts = getCategoryPosts('devBoard');
+        mainView = (
+          <>
+            <div className="content-card info-card">
+              <h2>{TEXT.devTitle}</h2>
+              <p>{TEXT.devSubtitle}</p>
+            </div>
+            <MainContainer
+              posts={boardPosts}
+              onOpenPost={handleOpenPost}
+              onEditPost={handleEditPost}
+              onDeletePost={handleDeletePost}
+              onReactPost={handleReactPost}
+              currentUser={currentUser}
+            />
+          </>
+        );
+        break;
+      }
       case 'search':
         mainView = (
           <>
@@ -526,7 +766,12 @@ function MemoContainer({ activeView = 'home', onChangeView = () => {} }) {
       default:
         mainView = (
           <>
-            <PopularPosts posts={decoratedPosts} onOpenPost={handleOpenPost} />
+            <PopularPosts
+              posts={decoratedPosts}
+              onOpenPost={handleOpenPost}
+              sortMode={popularSort}
+              onSortChange={setPopularSort}
+            />
             <MainContainer
               posts={visiblePosts}
               onOpenPost={handleOpenPost}

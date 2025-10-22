@@ -2,13 +2,23 @@ import React, { useMemo } from 'react';
 
 const TEXT = {
   title: '인기글',
-  subtitle: '좋아요 순으로 가장 핫한 글이에요',
+  subtitle: '원하는 인기 기준으로 상위 글을 확인해보세요.',
   previewFallback: '내용 미리보기가 아직 없어요.',
   anonymous: '익명',
   like: '좋아요',
+  views: '조회수',
+  sortViews: '조회순',
+  sortLikes: '좋아요순',
 };
 
-function PopularPosts({ posts = [], onOpenPost = () => {} }) {
+function PopularPosts({
+  posts = [],
+  onOpenPost = () => {},
+  sortMode = 'views',
+  onSortChange = () => {},
+}) {
+  const activeSort = sortMode === 'likes' ? 'likes' : 'views';
+
   const popularList = useMemo(() => {
     if (!Array.isArray(posts)) return [];
     const getTime = (value) => {
@@ -20,14 +30,24 @@ function PopularPosts({ posts = [], onOpenPost = () => {} }) {
       .map((post) => ({
         ...post,
         likes: typeof post.likes === 'number' ? post.likes : 0,
+        views: typeof post.views === 'number' ? post.views : 0,
       }))
       .sort((a, b) => {
-        const likeDiff = b.likes - a.likes;
-        if (likeDiff !== 0) return likeDiff;
+        if (activeSort === 'likes') {
+          const likeDiff = b.likes - a.likes;
+          if (likeDiff !== 0) return likeDiff;
+          const viewDiff = b.views - a.views;
+          if (viewDiff !== 0) return viewDiff;
+        } else {
+          const viewDiff = b.views - a.views;
+          if (viewDiff !== 0) return viewDiff;
+          const likeDiff = b.likes - a.likes;
+          if (likeDiff !== 0) return likeDiff;
+        }
         return getTime(b.createdAt) - getTime(a.createdAt);
       })
-      .slice(0, 4);
-  }, [posts]);
+      .slice(0, 6);
+  }, [posts, activeSort]);
 
   if (!popularList.length) return null;
 
@@ -37,6 +57,24 @@ function PopularPosts({ posts = [], onOpenPost = () => {} }) {
         <div>
           <h2>{TEXT.title}</h2>
           <span className="popular-section__subtitle">{TEXT.subtitle}</span>
+        </div>
+        <div className="popular-section__controls">
+          {['views', 'likes'].map((option) => {
+            const isActive = activeSort === option;
+            const label = option === 'views' ? TEXT.sortViews : TEXT.sortLikes;
+            return (
+              <button
+                key={option}
+                type="button"
+                className={`popular-sort-button${
+                  isActive ? ' is-active' : ''
+                }`}
+                onClick={() => onSortChange(option)}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -63,9 +101,11 @@ function PopularPosts({ posts = [], onOpenPost = () => {} }) {
                   <span className="popular-card__author">
                     {post.author || TEXT.anonymous}
                   </span>
-                  &nbsp;&nbsp;
-                  <span className="popular-card__likes">
-                    {post.likes} {TEXT.like}
+                  <span className="popular-card__metric popular-card__metric--views">
+                    {TEXT.views} {post.views.toLocaleString()}
+                  </span>
+                  <span className="popular-card__metric popular-card__metric--likes">
+                    {TEXT.like} {post.likes.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -78,3 +118,5 @@ function PopularPosts({ posts = [], onOpenPost = () => {} }) {
 }
 
 export default PopularPosts;
+
+

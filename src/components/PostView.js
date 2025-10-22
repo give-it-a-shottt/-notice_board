@@ -16,6 +16,7 @@ const TEXT = {
   commentFail: '댓글 등록 실패',
   anonymous: '익명',
   separator: '·',
+  views: '조회수',
 };
 
 function PostView({
@@ -50,6 +51,7 @@ function PostView({
 
   const likes = typeof post.likes === 'number' ? post.likes : 0;
   const dislikes = typeof post.dislikes === 'number' ? post.dislikes : 0;
+  const views = typeof post.views === 'number' ? post.views : 0;
   const viewerReaction =
     post.viewerReaction &&
     (post.viewerReaction === 'like' || post.viewerReaction === 'dislike')
@@ -72,6 +74,9 @@ function PostView({
         {post.author?.username || post.author || TEXT.anonymous}{' '}
         {TEXT.separator}{' '}
         {new Date(post.createdAt).toLocaleString()}
+        {' '}
+        {TEXT.separator}{' '}
+        {TEXT.views} {views.toLocaleString()}
         {currentUser &&
           (currentUser.username || currentUser) ===
             (post.author?.username || post.author) && (

@@ -3,12 +3,15 @@ from typing import Any, Dict, List, Optional, Set
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
+from pymongo import ReturnDocument
 
 from ..database import get_db
 from ..dependencies import get_current_user
 from ..utils import build_author_payload, ensure_object_id, isoformat, str_object_id
 
 router = APIRouter(prefix="/api/posts", tags=["posts"])
+
+VALID_CATEGORIES = {"game", "study", "dev"}
 
 
 async def _collect_users(db, user_ids: Set[ObjectId]) -> Dict[ObjectId, Dict[str, Any]]:
@@ -24,6 +27,15 @@ def _normalize_object_id(value: Any) -> ObjectId:
     if isinstance(value, ObjectId):
         return value
     return ObjectId(value)
+
+
+def _normalize_category(value: Optional[str]) -> Optional[str]:
+    if not value:
+        return None
+    normalized = value.strip().lower()
+    if normalized in VALID_CATEGORIES:
+        return normalized
+    return None
 
 
 async def _build_post_response(db, post: Dict[str, Any]) -> Dict[str, Any]:
@@ -59,6 +71,8 @@ async def _build_post_response(db, post: Dict[str, Any]) -> Dict[str, Any]:
         "createdAt": isoformat(post.get("created_at") or post.get("createdAt")),
         "updatedAt": isoformat(post.get("updated_at") or post.get("updatedAt")),
         "comments": [map_comment(c) for c in normalized_comments],
+        "category": _normalize_category(post.get("category")),
+        "views": post.get("views", 0),
         "likes": post.get("likes", 0),
         "dislikes": post.get("dislikes", 0),
     }
@@ -78,6 +92,7 @@ async def create_post(
     db=Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+    category = _normalize_category(payload.get("category"))
     title = (payload.get("title") or "").strip()
     body = (payload.get("body") or "").strip()
     image_url: Optional[str] = payload.get("imageUrl") or None
@@ -93,6 +108,8 @@ async def create_post(
         "comments": [],
         "likes": payload.get("likes", 0) or 0,
         "dislikes": payload.get("dislikes", 0) or 0,
+        "views": payload.get("views", 0) or 0,
+        "category": category,
         "created_at": now,
         "updated_at": now,
     }
@@ -153,6 +170,8 @@ async def update_post(
         updates["body"] = payload["body"].strip()
     if "imageUrl" in payload:
         updates["imageUrl"] = payload["imageUrl"] or None
+    if "category" in payload:
+        updates["category"] = _normalize_category(payload.get("category"))
 
     if not updates:
         return await _build_post_response(db, post)
@@ -209,6 +228,19 @@ async def delete_comment(
     )
     post = await db["posts"].find_one({"_id": post_object_id})
     return await _build_post_response(db, post)
+
+
+@router.post("/{post_id}/views")
+async def increment_post_views(post_id: str, db=Depends(get_db)):
+    post_object_id = ensure_object_id(post_id, field="postId")
+    updated = await db["posts"].find_one_and_update(
+        {"_id": post_object_id},
+        {"$inc": {"views": 1}, "$set": {"updated_at": datetime.utcnow()}},
+        return_document=ReturnDocument.AFTER,
+    )
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    return await _build_post_response(db, updated)
 
 
 @router.put("/{post_id}/comments/{comment_id}")
