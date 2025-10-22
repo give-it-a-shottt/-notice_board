@@ -771,16 +771,21 @@ textarea {
 
 .post-editor__preview {
   border-radius: 20px;
-  overflow: hidden;
   border: 1px solid rgba(16, 24, 40, 0.12);
   background: rgba(37, 99, 235, 0.08);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .post-editor__preview img {
-  width: 100%;
-  max-height: 240px;
-  object-fit: cover;
   display: block;
+  max-width: 100%;
+  max-height: 420px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .post-editor__textarea {
@@ -831,13 +836,19 @@ textarea {
   overflow: hidden;
   border: 1px solid rgba(16, 24, 40, 0.12);
   background: rgba(37, 99, 235, 0.08);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .post-view__hero img {
-  width: 100%;
-  max-height: 380px;
-  object-fit: cover;
   display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
 }
 
 .post-view__body {
